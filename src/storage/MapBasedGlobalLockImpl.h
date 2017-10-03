@@ -15,11 +15,19 @@ namespace Backend {
  *
  *
  */
+struct val{
+	std::string item;
+	std::string prev;
+	std::string next;
+};
+ 
 class MapBasedGlobalLockImpl : public Afina::Storage {
 public:
-    MapBasedGlobalLockImpl(size_t max_size = 1024) : _max_size(max_size) {}
-    ~MapBasedGlobalLockImpl() {}
-
+    MapBasedGlobalLockImpl(size_t max_size = 1024) : _max_size(max_size) {
+    	curr_size=0;
+    }
+    ~MapBasedGlobalLockImpl(){
+  	}
     // Implements Afina::Storage interface
     bool Put(const std::string &key, const std::string &value) override;
 
@@ -39,8 +47,14 @@ private:
     std::mutex _lock;
 
     size_t _max_size;
+    
+    size_t curr_size;
 
-    std::map<std::string, std::string> data;
+    std::map<std::string, val> data;
+    
+    std::string youngest;
+    std::string oldest;
+    
 };
 
 } // namespace Backend
