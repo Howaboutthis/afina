@@ -1,10 +1,14 @@
 #include "MapBasedGlobalLockImpl.h"
 using namespace std;
+
+#include <mutex>
+
 namespace Afina {
 namespace Backend {
 
 // See MapBasedGlobalLockImpl.h
 bool MapBasedGlobalLockImpl::Put(const std::string &key, const std::string &value) {
+    std::unique_lock<std::mutex> guard(_lock);
 	if(data.find(key)!=data.end()){
 		if(Delete(key))
 			return PutIfAbsent(key,value);
@@ -17,6 +21,7 @@ bool MapBasedGlobalLockImpl::Put(const std::string &key, const std::string &valu
 
 // See MapBasedGlobalLockImpl.h
 bool MapBasedGlobalLockImpl::PutIfAbsent(const std::string &key, const std::string &value){
+    std::unique_lock<std::mutex> guard(_lock);
 	if(data.find(key)!=data.end())
 		return false;
 	if (curr_size>_max_size)
@@ -41,6 +46,7 @@ bool MapBasedGlobalLockImpl::PutIfAbsent(const std::string &key, const std::stri
 		
 }
 
+
 // See MapBasedGlobalLockImpl.h
 bool MapBasedGlobalLockImpl::Set(const std::string &key, const std::string &value) {
 	map<string,val>::iterator pos=data.find(key);
@@ -52,6 +58,7 @@ bool MapBasedGlobalLockImpl::Set(const std::string &key, const std::string &valu
 
 // See MapBasedGlobalLockImpl.h
 bool MapBasedGlobalLockImpl::Delete(const std::string &key){
+    std::unique_lock<std::mutex> guard(_lock);
 	map<string,val>::iterator pos=data.find(key);
 	if (pos==data.end())
 		return false;
@@ -78,8 +85,10 @@ bool MapBasedGlobalLockImpl::Delete(const std::string &key){
 	return true;
 }
 
+
 // See MapBasedGlobalLockImpl.h
 bool MapBasedGlobalLockImpl::Get(const std::string &key, std::string &value) const {
+    std::unique_lock<std::mutex> guard(_lock);
 	if (data.find(key)==data.end())
 		return false;
 	else{
