@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <pthread.h>
+#include <map>
 
 namespace Afina {
 
@@ -11,6 +12,9 @@ class Storage;
 
 namespace Network {
 namespace NonBlocking {
+
+struct ParseData;
+struct ParseTool;
 
 /**
  * # Thread running epoll
@@ -47,10 +51,14 @@ protected:
     /**
      * Method executing by background thread
      */
-    void OnRun(void *args);
+    void OnRun(int server_socket);
+    static void* GettingStarted(void *args);
+    std::string ParseString(char *buffer, Afina::Network::NonBlocking::ParseTool& parsetool);
 
 private:
+    std::shared_ptr<Afina::Storage> pStorage;
     pthread_t thread;
+    bool stop;
 };
 
 } // namespace NonBlocking
