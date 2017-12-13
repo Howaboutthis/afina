@@ -211,7 +211,7 @@ void Worker::OnRun(int sfd){
                 }
                 make_socket_non_blocking(infd);
                 struct epoll_event infd_event;
-                infd_event.events=EPOLLIN | EPOLLOUT | EPOLLRDHUP;
+                infd_event.events=EPOLLIN | EPOLLRDHUP;
                 infd_event.data.fd=infd;
                 if(epoll_ctl(efd, EPOLL_CTL_ADD, infd, &infd_event) == -1) {
                     close(infd);
